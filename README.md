@@ -40,59 +40,9 @@ git clone https://github.com/your-username/reddit-to-slack-n8n.git
 cd reddit-to-slack-n8n
 ```
 2. Import into n8n
-Open your n8n instance
-Click Import Workflow
-Select reddit_flow_cleaned.json
-🔐 Setup Instructions
-
-Make sure to configure the following:
-
-✅ Required Credentials
-Integration	Description
-Reddit OAuth2 API	Reddit App (script type) with client ID/secret and user login
-Supabase API	Project URL + service role key
-OpenAI API	API Key and 3 Assistants (Filter, Summarizer, Formatter)
-Slack API	Bot token with chat:write + channels:read
-See the Sticky Note in the workflow for full setup details.
-🗃 Supabase Schema
-
-You’ll need two tables and one RPC function:
-
-user_subreddit_preferences
-CREATE TABLE user_subreddit_preferences (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL,
-  subreddit TEXT NOT NULL,
-  sort_method TEXT DEFAULT 'hot',
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-reddit_posts
-CREATE TABLE reddit_posts (
-  id TEXT PRIMARY KEY,
-  user_id UUID NOT NULL,
-  subreddit TEXT,
-  author TEXT,
-  title TEXT,
-  selftext TEXT,
-  url TEXT,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  summarized BOOLEAN DEFAULT FALSE,
-  summarized_output TEXT,
-  is_enriching BOOLEAN DEFAULT FALSE
-);
-RPC: check_post_exists
-CREATE FUNCTION check_post_exists(post_id TEXT)
-RETURNS TABLE(exists BOOLEAN)
-LANGUAGE sql
-AS $$
-  SELECT EXISTS (SELECT 1 FROM reddit_posts WHERE id = post_id) AS exists;
-$$;
-🧪 Testing
-
-Add a record to user_subreddit_preferences
-Trigger the workflow manually
-Check Slack for a formatted post or logs in Supabase for status
-
+- Open your n8n instance
+- Click Import Workflow
+- Select reddit_flow_cleaned.json
 
 📝 License
 
