@@ -42,7 +42,9 @@ cd reddit-to-slack-n8n
 2. Import into n8n
 - Open your n8n instance
 - Click Import Workflow
-- Select reddit_flow_cleaned.json
+- Select reddit_content_flow.json
+
+3. Run the SQL DDL (sql_script) in your Supabase / Postgres instance
 
 📝 License
 
