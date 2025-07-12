@@ -40,7 +40,7 @@ This automation:
 
 ```
 git clone https://github.com/kenandrewmiranda/reddit-content-filter-n8n.git
-cd reddit-to-slack-n8n
+cd reddit-content-filter-n8n
 ```
 
 ### 2. Import the Workflow into n8n
