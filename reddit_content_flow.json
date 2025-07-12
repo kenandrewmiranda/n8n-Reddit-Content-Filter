@@ -1,0 +1,1703 @@
+{
+  "name": "reddit_content_flow",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d96a156e-80ad-474d-be82-dca53cf7c100",
+              "leftValue": "={{ $json.upvote_ratio }}",
+              "rightValue": 0.9,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -7780,
+        1100
+      ],
+      "id": "932ac186-e461-42ef-ab52-aba3898d9bbb",
+      "name": "Filter Upvote Ratio to greater than 90"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://enter_endpoint_here.supabase.co/rest/v1/rpc/check_post_exists",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "p_id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -7560,
+        1100
+      ],
+      "id": "1e9ddc12-4134-4f35-b79a-0306c48fc722",
+      "name": "Supabase - Check Post Exist",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0a304a3a-4c13-4f09-b9e6-353f3bf0d1da",
+              "name": "id",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "d4414743-bae3-48e1-ac35-e32eb52897cc",
+              "name": "subreddit",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.subreddit }}",
+              "type": "string"
+            },
+            {
+              "id": "5753e30b-e7cd-4d7c-9552-ee3792ae51b1",
+              "name": "title",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "bd44aea8-50a2-4388-a85b-e3a40326b436",
+              "name": "selftext",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.selftext }}",
+              "type": "string"
+            },
+            {
+              "id": "9873f528-b160-4610-b0cb-0e42a86a104b",
+              "name": "url",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "33433228-c628-4950-a5cd-aa2996e25020",
+              "name": "author",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.author }}",
+              "type": "string"
+            },
+            {
+              "id": "8dc45a94-e178-45fe-b4e9-984fa516c372",
+              "name": "score",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.score }}",
+              "type": "number"
+            },
+            {
+              "id": "7e52289d-7209-42f4-91ae-1ef9ca766bed",
+              "name": "num_comments",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.num_comments }}",
+              "type": "number"
+            },
+            {
+              "id": "3969c2b4-c42f-4198-b564-c9015236d726",
+              "name": "is_self",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.is_self }}",
+              "type": "boolean"
+            },
+            {
+              "id": "4cb55f71-afd9-400a-8cb6-36447c40f97d",
+              "name": "created_utc",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.created_utc }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -7120,
+        1000
+      ],
+      "id": "f4d2a699-d53f-4c6a-8411-f56ac7cc1f1c",
+      "name": "Set Database Columns"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const selftext = $input.item.json.selftext || \"\";\n\n// Estimate tokens (1 token \u2248 4 characters)\nconst tokenEstimate = Math.ceil(selftext.length / 4);\n\n// Add new field\n$input.item.json.summarized = tokenEstimate > 100;\n\nreturn $input.item;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -6900,
+        1000
+      ],
+      "id": "235ddfbf-9571-401a-8c92-78bd9ce9cc5a",
+      "name": "Check Length"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0a304a3a-4c13-4f09-b9e6-353f3bf0d1da",
+              "name": "id",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "d4414743-bae3-48e1-ac35-e32eb52897cc",
+              "name": "subreddit",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.subreddit }}",
+              "type": "string"
+            },
+            {
+              "id": "5753e30b-e7cd-4d7c-9552-ee3792ae51b1",
+              "name": "title",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "bd44aea8-50a2-4388-a85b-e3a40326b436",
+              "name": "selftext",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "9873f528-b160-4610-b0cb-0e42a86a104b",
+              "name": "url",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "33433228-c628-4950-a5cd-aa2996e25020",
+              "name": "author",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.author }}",
+              "type": "string"
+            },
+            {
+              "id": "8dc45a94-e178-45fe-b4e9-984fa516c372",
+              "name": "score",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.score }}",
+              "type": "number"
+            },
+            {
+              "id": "7e52289d-7209-42f4-91ae-1ef9ca766bed",
+              "name": "num_comments",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.num_comments }}",
+              "type": "number"
+            },
+            {
+              "id": "3969c2b4-c42f-4198-b564-c9015236d726",
+              "name": "is_self",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.is_self }}",
+              "type": "boolean"
+            },
+            {
+              "id": "4cb55f71-afd9-400a-8cb6-36447c40f97d",
+              "name": "created_utc",
+              "value": "={{ $('Filter Upvote Ratio to greater than 90').item.json.created_utc }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6040,
+        900
+      ],
+      "id": "7707d9bb-2849-46fc-b182-26706dffbfe2",
+      "name": "Set Database Columns with Summarization"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "43bd7b85-b098-4ebb-bab6-d3531d80ecdf",
+              "leftValue": "={{ $json.summarized }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -6680,
+        1000
+      ],
+      "id": "ad567e61-3d93-4e3b-b7b4-90443cf76dec",
+      "name": "Check if Summarization is Required"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -7120,
+        1200
+      ],
+      "id": "b19d5d84-8cf5-4798-8239-a73f3899242f",
+      "name": "End of Path (P1)"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "subreddit": "={{ $json.subreddit }}",
+        "limit": 5,
+        "filters": {
+          "category": "={{ $json.sort_method }}"
+        }
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [
+        -8000,
+        1100
+      ],
+      "id": "103939de-50c9-4a98-b43a-1834e8dbc6b8",
+      "name": "Get New Posts Based on User Preference",
+      "credentials": {
+        "redditOAuth2Api": {
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "afaeeba0-2230-41a5-988d-556c66733322",
+              "leftValue": "={{ $json.exists }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -7340,
+        1100
+      ],
+      "id": "43bbbe86-ab92-4255-994e-f004819975b7",
+      "name": "Route on if Post Already Exists"
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_7rWDVjy2TI08WuBXgtS6Kfkz",
+          "mode": "list",
+          "cachedResultName": "Reddit Assistant (TEXT)"
+        },
+        "prompt": "define",
+        "text": "=Subreddit:  {{ $json.subreddit }}\nTitle: {{ $json.title }}\nContent: {{ $json.selftext }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -5480,
+        900
+      ],
+      "id": "8a3888aa-0fe6-4e43-99fd-ebf34438fe3b",
+      "name": "Reddit Content Filter (RCF-1)",
+      "retryOnFail": true,
+      "credentials": {
+        "openAiApi": {
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_7rWDVjy2TI08WuBXgtS6Kfkz",
+          "mode": "list",
+          "cachedResultName": "Reddit Assistant (TEXT)"
+        },
+        "prompt": "define",
+        "text": "=Subreddit:  {{ $json.subreddit }}\nTitle: {{ $json.title }}\nContent: {{ $json.selftext }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -6100,
+        1100
+      ],
+      "id": "3a6b4de8-0738-4b79-9a9c-fd2c19af48b6",
+      "name": "Reddit Content Filter (RCF-2)",
+      "retryOnFail": true,
+      "credentials": {
+        "openAiApi": {
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cbf80cc6-74d3-403a-8993-b3df1c180064",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "=continue",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -5720,
+        1100
+      ],
+      "id": "7e0455dc-5cb1-430e-a403-286afef5041a",
+      "name": "Filter out \"Skip\" (F-2)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cbf80cc6-74d3-403a-8993-b3df1c180064",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "=continue",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -5100,
+        900
+      ],
+      "id": "5adedb34-2115-4b22-8e01-61eb1fa29bd3",
+      "name": "Filter out \"Skip\" (F-1)"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "reddit_posts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Create New Record in Database (C-1)').item.json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "is_enriching",
+              "fieldValue": "true"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -4820,
+        900
+      ],
+      "id": "5f6283ab-2655-4d9c-b3ae-f2575b928bc8",
+      "name": "Update \"Is Enriching\" Flag (U-1)",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "reddit_posts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Create New Record in Database (C-2)').item.json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "is_enriching",
+              "fieldValue": "true"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -5460,
+        1100
+      ],
+      "id": "9007987d-11c4-47c1-92b2-a61d0f395e56",
+      "name": "Update \"Is Enriching\" Flag (U-2)",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -3780,
+        900
+      ],
+      "id": "25403aef-d2fa-4fc2-bde4-7f5c65ec81cd",
+      "name": "End of Path (P3)"
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_Lx9pj79hEZYXnPciYS3BlHDV",
+          "mode": "list",
+          "cachedResultName": "Summarizer Agent (text)"
+        },
+        "prompt": "define",
+        "text": "={{ $('Check Length').item.json.selftext }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -6460,
+        900
+      ],
+      "id": "f2cc371d-b0db-4384-ab73-0de3645271fd",
+      "name": "Summarize Long Text",
+      "retryOnFail": true,
+      "credentials": {
+        "openAiApi": {
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_i26QGLynOAXEXDh2Tj79NJIv",
+          "mode": "list",
+          "cachedResultName": "Reddit Message Parser"
+        },
+        "prompt": "define",
+        "text": "=title:  {{ $json.title }}\nselftext: {{ $json.selftext }}\nurl: {{ $json.url }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -5200,
+        1100
+      ],
+      "id": "af9d8712-8cd8-43cf-adf8-f139a7741be6",
+      "name": "Output Formatter (OF-2)",
+      "retryOnFail": true,
+      "credentials": {
+        "openAiApi": {
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_i26QGLynOAXEXDh2Tj79NJIv",
+          "mode": "list",
+          "cachedResultName": "Reddit Message Parser"
+        },
+        "prompt": "define",
+        "text": "=title:  {{ $json.title }}\nselftext: {{ $json.selftext }}\nurl: {{ $json.url }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -4600,
+        900
+      ],
+      "id": "2cf0e258-542f-4789-ba42-ad5108b5ff24",
+      "name": "Output Formatter (OF-1)",
+      "retryOnFail": true,
+      "credentials": {
+        "openAiApi": {
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -8440,
+        1100
+      ],
+      "id": "ce986846-20c2-4f73-a494-4d1e3f589297",
+      "name": "Run Every 1 Hour"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "your-channel-name"
+        },
+        "text": "={{ $json.summarized_output }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -3980,
+        900
+      ],
+      "id": "86494638-7bb9-4a65-8e62-349d9cd91647",
+      "name": "Post to Subreddit Channel (SC-1)",
+      "webhookId": "8c6c436c-f2b0-41fa-ba68-393f0468ddba",
+      "credentials": {
+        "slackApi": {
+          "name": "Assist Plus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "your-channel-name"
+        },
+        "text": "={{ $json.summarized_output }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -4560,
+        1100
+      ],
+      "id": "4bfc903d-88eb-4ac9-af81-b5588299c13e",
+      "name": "Post to Subreddit Channel  (SC-2)",
+      "webhookId": "8c6c436c-f2b0-41fa-ba68-393f0468ddba",
+      "credentials": {
+        "slackApi": {
+          "name": "Assist Plus"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -4340,
+        1100
+      ],
+      "id": "7887ca46-4485-4bd2-9653-94533e0b5ea4",
+      "name": "End of Path (P2)"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "reddit_posts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Create New Record in Database (C-1)').item.json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "summarized_output",
+              "fieldValue": "={{ $json.output }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -4200,
+        900
+      ],
+      "id": "95e1cd33-94a3-461b-a2f5-a874fc858a3e",
+      "name": "Update Summarized Output (USO-1)",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "reddit_posts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Create New Record in Database (C-2)').item.json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "summarized_output",
+              "fieldValue": "={{ $json.output }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -4820,
+        1100
+      ],
+      "id": "518ccb95-ffd9-4d08-a566-4746fd49267e",
+      "name": "Update Summarized Output (USO-2)",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Triggers the workflow every hour to fetch new posts.",
+        "height": 360,
+        "width": 190,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -8480,
+        920
+      ],
+      "typeVersion": 1,
+      "id": "504c8bd2-8a17-473c-b88c-5af7feca59af",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Retrieves subreddits from the Supabase user_subreddit_preferences table for a given user_id.\n",
+        "height": 360,
+        "width": 210,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -8280,
+        920
+      ],
+      "typeVersion": 1,
+      "id": "d3012812-190a-47d2-b209-0c322ecbf550",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Uses the retrieved subreddit and sort method to fetch recent Reddit posts (limit 5, change to your preference).",
+        "height": 360,
+        "width": 210,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -8060,
+        920
+      ],
+      "typeVersion": 1,
+      "id": "faaae56c-43c0-4dfc-bae4-d49712f13daa",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "Filters out posts with an upvote ratio below 0.9 to retain high-quality content.",
+        "height": 360,
+        "width": 210,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -7840,
+        920
+      ],
+      "typeVersion": 1,
+      "id": "5e2b3ae1-3ea0-4632-bc46-ab92e905a07a",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "Calls a Supabase RPC to check if the Reddit post ID already exists in your database.\n\n**Add your supabase endpoint in the URL section**",
+        "height": 360,
+        "width": 230,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -7620,
+        920
+      ],
+      "typeVersion": 1,
+      "id": "40fc7016-b935-4e86-9b97-37ea2200a287",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "If new \u2192 proceed with processing.\n\nIf the post exists \u2192 end path.\n\n",
+        "height": 360,
+        "width": 190,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -7380,
+        920
+      ],
+      "typeVersion": 1,
+      "id": "bd5270f4-38ee-4a91-854b-4b01e85e31c8",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "Sets standard fields (id, title, author, etc.) for the Reddit post.",
+        "height": 320,
+        "width": 210,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -7180,
+        860
+      ],
+      "typeVersion": 1,
+      "id": "e76c90ee-9f74-4c9f-98ca-11ead550c57b",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "Estimates if the content is longer than 500 tokens (approx.) and flags if it needs summarization.",
+        "height": 320,
+        "width": 210,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -6960,
+        860
+      ],
+      "typeVersion": 1,
+      "id": "31beee81-b589-40e9-bc72-7fba68e2b82a",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "If summarized = true, \u2192 summarize using OpenAI (Summarize Long Text)\n\nElse \u2192 skip summarization",
+        "height": 320,
+        "width": 250,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -6740,
+        860
+      ],
+      "typeVersion": 1,
+      "id": "ae29b018-079d-4f17-b806-73d67782a804",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "**System Prompt:**\n\nrole: summarization_agent\ninstructions:\n  - Summarize clearly and concisely in note-like sentences.\n  - Preserve all critical info, key points, relationships, and context.\n  - Focus only on the main topic, key facts, important relationships, and conclusions.\n  - Avoid full paragraphs, creative rewriting, assumptions, or omitting critical info.\n  - Format output as direct bullet points or short, standalone sentences.\n  - Ensure another agent can act based on output alone.\n  - Do not use line breaks (\\n); output must be continuous text.\n  - Do not add extra symbols, emojis, markdown, or formatting beyond plain text.",
+        "height": 560,
+        "width": 370,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -6480,
+        480
+      ],
+      "typeVersion": 1,
+      "id": "849ce3d1-baf6-4e79-8fe6-7c5e95ebe3db",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Replaces original selftest with the summarized version.",
+        "height": 220,
+        "width": 250,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -6100,
+        820
+      ],
+      "typeVersion": 1,
+      "id": "dbbfb921-8c13-4e29-ad24-6da874c27acc",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCreates new record in the reddit_posts table.",
+        "height": 280,
+        "width": 290,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -6480,
+        1060
+      ],
+      "typeVersion": 1,
+      "id": "d81b3890-9c76-4e7e-b89f-5c1260245d74",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "Creates new record in the reddit_posts table.",
+        "height": 220,
+        "width": 290,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5840,
+        820
+      ],
+      "typeVersion": 1,
+      "id": "36eea326-c767-47dd-9f88-771aa4370651",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n**System Prompt**:\n\nrole: reddit_assistant\npurpose: >\n  Help the user avoid time-wasting Reddit scrolling by filtering rising posts from favorite subreddits.\n\ninput: \n  - title\n  - body\n\nevaluation_criteria:\n  keep_if:\n    - Offers intellectual depth or complexity (e.g., nuanced opinions, technical challenges, systems thinking)\n    - Stimulates self-growth or advanced learning (e.g., methodologies, career-level insights, philosophical framing)\n    - Presents unique expertise, emerging trends, or refined best practices\n    - Sparks critical thinking or creativity, even if not directly actionable\n  skip_if:\n    - Caters to beginners, asks basic questions, or explains common knowledge\n    - Focused on helping others without enriching the user\u2019s perspective\n    - Primarily promotional or self-advertising, such as:\n        - Linking to personal content (e.g., YouTube, Medium, Gumroad)\n        - Phrases like \u201ccheck out my,\u201d \u201csign up for,\u201d \u201cmy new project\u201d\n        - Posts that only describe a product, service, or release\n    - Lacks depth, substance, or curiosity-triggering ideas\n\noutput_format: |\n  Always return one of the following options:\n  continue\n  or\n  skip\n\nrules:\n  - Do not summarize the post\n  - Do not rewrite or comment on the post\n  - Only judge based on potential for personal intellectual growth\n  - If the post is a mix, err on the side of \"skip\" unless the core is deeply enriching\n",
+        "height": 1260,
+        "width": 390,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -6180,
+        1060
+      ],
+      "typeVersion": 1,
+      "id": "bb4b176c-6116-4f28-8d8c-8395f77b2b27",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "**System Prompt**:\n\nrole: reddit_assistant\npurpose: >\n  Help the user avoid time-wasting Reddit scrolling by filtering rising posts from favorite subreddits.\n\ninput: \n  - title\n  - body\n\nevaluation_criteria:\n  keep_if:\n    - Offers intellectual depth or complexity (e.g., nuanced opinions, technical challenges, systems thinking)\n    - Stimulates self-growth or advanced learning (e.g., methodologies, career-level insights, philosophical framing)\n    - Presents unique expertise, emerging trends, or refined best practices\n    - Sparks critical thinking or creativity, even if not directly actionable\n  skip_if:\n    - Caters to beginners, asks basic questions, or explains common knowledge\n    - Focused on helping others without enriching the user\u2019s perspective\n    - Primarily promotional or self-advertising, such as:\n        - Linking to personal content (e.g., YouTube, Medium, Gumroad)\n        - Phrases like \u201ccheck out my,\u201d \u201csign up for,\u201d \u201cmy new project\u201d\n        - Posts that only describe a product, service, or release\n    - Lacks depth, substance, or curiosity-triggering ideas\n\noutput_format: |\n  Always return one of the following options:\n  continue\n  or\n  skip\n\nrules:\n  - Do not summarize the post\n  - Do not rewrite or comment on the post\n  - Only judge based on potential for personal intellectual growth\n  - If the post is a mix, err on the side of \"skip\" unless the core is deeply enriching\n",
+        "height": 1180,
+        "width": 370,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5540,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "979c76d5-2437-4447-9cfc-98b4a7758d11",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFilters out content based on AI Classification",
+        "height": 280,
+        "width": 230,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5780,
+        1060
+      ],
+      "typeVersion": 1,
+      "id": "a6f4afea-87c4-480b-ada1-0a5cb07b3bc5",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "Filters out content based on AI Classification",
+        "height": 220,
+        "width": 250,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5160,
+        820
+      ],
+      "typeVersion": 1,
+      "id": "e64e553d-c001-4422-8a2c-99ba3e4beda7",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nUpdates the is_enriching value in the reddit_posts table.",
+        "height": 280,
+        "width": 250,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5540,
+        1060
+      ],
+      "typeVersion": 1,
+      "id": "5b10acd1-3fde-4f64-8022-ae15ddf6d1c0",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "tableId": "reddit_posts",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "subreddit",
+              "fieldValue": "={{ $json.subreddit }}"
+            },
+            {
+              "fieldId": "title",
+              "fieldValue": "={{ $json.title }}"
+            },
+            {
+              "fieldId": "selftext",
+              "fieldValue": "={{ $json.selftext }}"
+            },
+            {
+              "fieldId": "url",
+              "fieldValue": "={{ $json.url }}"
+            },
+            {
+              "fieldId": "author",
+              "fieldValue": "={{ $json.author }}"
+            },
+            {
+              "fieldId": "score",
+              "fieldValue": "={{ $json.score }}"
+            },
+            {
+              "fieldId": "num_comments",
+              "fieldValue": "={{ $json.num_comments }}"
+            },
+            {
+              "fieldId": "is_self",
+              "fieldValue": "={{ $json.is_self }}"
+            },
+            {
+              "fieldId": "created_utc",
+              "fieldValue": "={{ $json.created_utc }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -5740,
+        900
+      ],
+      "id": "39ac1986-7bf5-4a4d-945b-39e526b19bba",
+      "name": "Create New Record in Database (C-1)",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "reddit_posts",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "subreddit",
+              "fieldValue": "={{ $json.subreddit }}"
+            },
+            {
+              "fieldId": "title",
+              "fieldValue": "={{ $json.title }}"
+            },
+            {
+              "fieldId": "selftext",
+              "fieldValue": "={{ $json.selftext }}"
+            },
+            {
+              "fieldId": "url",
+              "fieldValue": "={{ $json.url }}"
+            },
+            {
+              "fieldId": "author",
+              "fieldValue": "={{ $json.author }}"
+            },
+            {
+              "fieldId": "score",
+              "fieldValue": "={{ $json.score }}"
+            },
+            {
+              "fieldId": "num_comments",
+              "fieldValue": "={{ $json.num_comments }}"
+            },
+            {
+              "fieldId": "is_self",
+              "fieldValue": "={{ $json.is_self }}"
+            },
+            {
+              "fieldId": "created_utc",
+              "fieldValue": "={{ $json.created_utc }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -6380,
+        1100
+      ],
+      "id": "1c801eb9-86df-46ac-bf7e-3ddd2bb5106c",
+      "name": "Create New Record in Database (C-2)",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n**System Prompt**:\n\nsystem_message: |\n  Summarize Reddit posts with Slack formatting.\n\n  Input format per post:\n  Title:\n  Selftext:\n  URL:\n\n  Posts are separated by blank lines.\n\n  For each post:\n    - Create a simplified, clear title. Format it with *asterisks* for bold.\n    - Write a one-sentence overview starting with \"A user says\" or \"A user asks\".\n    - Add 3\u20135 short bullets (use \"-\") summarizing key points.\n    - End with: Source: <url> (use Slack-style angle brackets)\n    - Add: Should I respond? Yes/No \u2014 include a short reason based on insight or discussion value.\n    - Use \"---\" as a visual separator between posts.\n\n  Rules:\n    - Use Slack formatting (*bold*, <link>, ---).\n    - Write in simple, fast-to-read language.\n    - Skip ads or self-promotion.\n    - Only one post per summary.\n    - Don\u2019t respond if the post lacks depth, is a rant, or is just praise.\n",
+        "height": 840,
+        "width": 390,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5280,
+        1060
+      ],
+      "typeVersion": 1,
+      "id": "5b524dc6-40fc-452a-978c-872dc94df9c9",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "content": "Updates the is_enriching value in the reddit_posts table.",
+        "height": 220,
+        "width": 250,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4900,
+        820
+      ],
+      "typeVersion": 1,
+      "id": "eea3bdc4-605b-4ec6-8d09-cbb4bdcdfa0b",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "content": "**System Prompt**:\n\nsystem_message: |\n  Summarize Reddit posts with Slack formatting.\n\n  Input format per post:\n  Title:\n  Selftext:\n  URL:\n\n  Posts are separated by blank lines.\n\n  For each post:\n    - Create a simplified, clear title. Format it with *asterisks* for bold.\n    - Write a one-sentence overview starting with \"A user says\" or \"A user asks\".\n    - Add 3\u20135 short bullets (use \"-\") summarizing key points.\n    - End with: Source: <url> (use Slack-style angle brackets)\n    - Add: Should I respond? Yes/No \u2014 include a short reason based on insight or discussion value.\n    - Use \"---\" as a visual separator between posts.\n\n  Rules:\n    - Use Slack formatting (*bold*, <link>, ---).\n    - Write in simple, fast-to-read language.\n    - Skip ads or self-promotion.\n    - Only one post per summary.\n    - Don\u2019t respond if the post lacks depth, is a rant, or is just praise.\n",
+        "height": 760,
+        "width": 370,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4640,
+        280
+      ],
+      "typeVersion": 1,
+      "id": "40ef4388-d5ac-4676-8b53-d11e283ad178",
+      "name": "Sticky Note20"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nUpdates the summarized_output value in the reddit_posts table.",
+        "height": 280,
+        "width": 230,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4880,
+        1060
+      ],
+      "typeVersion": 1,
+      "id": "9709a30b-81b1-4fb7-936c-18fc64c7e689",
+      "name": "Sticky Note21"
+    },
+    {
+      "parameters": {
+        "content": "Updates the summarized_output value in the reddit_posts table.",
+        "height": 220,
+        "width": 210,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4260,
+        820
+      ],
+      "typeVersion": 1,
+      "id": "3cd674fc-b37e-45fb-8d6d-daa4b04c658a",
+      "name": "Sticky Note22"
+    },
+    {
+      "parameters": {
+        "content": "Posts Message to Slack Channel",
+        "height": 220,
+        "width": 230,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4040,
+        820
+      ],
+      "typeVersion": 1,
+      "id": "d88b6160-e17a-4942-8c3e-fd8d55afb6a7",
+      "name": "Sticky Note23"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPosts Message to Slack Channel",
+        "height": 280,
+        "width": 250,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4640,
+        1060
+      ],
+      "typeVersion": 1,
+      "id": "19664aa4-1cf9-4863-86a5-d22167b47123",
+      "name": "Sticky Note24"
+    },
+    {
+      "parameters": {
+        "content": "## Database Setup (supabase / postgres)\n### Copy and paste this into SQL Editor in supabase and run.\n-- =============================================\n-- STEP 1: Create the user_subreddit_preferences table\n-- =============================================\n\n-- This table links each user to subreddits they follow,\n-- and stores their preferred Reddit sort method.\n-- It includes:\n-- - Validated sort method\n-- - Automatic timestamps\n-- - Unique (user_id, subreddit) constraint to avoid duplicates\nCREATE TABLE user_subreddit_preferences (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),   -- Unique identifier for each preference\n  user_id UUID NOT NULL,                           -- The user this preference belongs to\n  subreddit TEXT NOT NULL,                         -- Subreddit name (e.g., 'technology')\n  sort_method TEXT NOT NULL DEFAULT 'hot'          -- Preferred sort method\n    CHECK (sort_method IN ('new', 'top', 'hot', 'rising')),  -- Only accept allowed values\n  created_at TIMESTAMPTZ DEFAULT now(),            -- Timestamp when the record was created\n  updated_at TIMESTAMPTZ DEFAULT now(),            -- Timestamp for last update\n  UNIQUE (user_id, subreddit)                      -- Ensure each user has only one preference per subreddit\n);\n\n-- ========================================================\n-- STEP 2: Insert a test user preference into the new table\n-- ========================================================\n\n-- This is a sample record to verify everything works as expected.\n-- It inserts a user preference for the subreddit 'n8n' with sort method 'hot'.\nINSERT INTO user_subreddit_preferences (\n  user_id,\n  subreddit,\n  sort_method\n) VALUES (\n  '6c8f2a36-fb1a-486a-8a45-5d574c7fba58', -- Sample user UUID\n  'n8n',                                  -- Subreddit name\n  'hot'                                   -- Sort method (valid: 'new', 'top', 'hot', 'rising')\n);\n\n-- =====================================================\n-- STEP 3: Create a trigger to automatically update 'updated_at'\n-- =====================================================\n\n-- This function updates the `updated_at` timestamp every time the row is modified.\nCREATE OR REPLACE FUNCTION update_updated_at_column()\nRETURNS TRIGGER AS $$\nBEGIN\n  NEW.updated_at = now();\n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\n-- Attach the trigger to the user_subreddit_preferences table.\nCREATE TRIGGER set_updated_at\nBEFORE UPDATE ON user_subreddit_preferences\nFOR EACH ROW\nEXECUTE FUNCTION update_updated_at_column();\n\n-- ============================================\n-- STEP 4: Create the reddit_posts table\n-- ============================================\n\n-- This table stores Reddit posts pulled from Reddit\u2019s API.\n-- It includes:\n-- - Post metadata (title, content, author)\n-- - Post metrics (score, num_comments)\n-- - Custom flags (is_enriching, shared_with_user)\n-- - An LLM-generated summary field for later analysis\nCREATE TABLE reddit_posts (\n  id TEXT PRIMARY KEY,                   -- Reddit post ID (e.g., 't3_abc123')\n  subreddit TEXT NOT NULL,              -- Subreddit where the post was found\n  title TEXT NOT NULL,                  -- Post title\n  selftext TEXT NOT NULL,               -- Post body/content\n  url TEXT NOT NULL,                    -- Link to the post\n  author TEXT NOT NULL,                 -- Reddit username of the author\n  score INTEGER,                        -- Post score\n  num_comments INTEGER,                 -- Number of comments\n  is_self BOOLEAN,                      -- Whether it's a self-post (text) or a link post\n  is_enriching BOOLEAN DEFAULT FALSE,   -- Custom flag for enriching content (e.g., AI-tagged)\n  shared_with_user BOOLEAN,             -- Whether the post was shown/shared with the user\n  summarized_output TEXT,               -- Optional LLM-generated summary for later evaluation\n  created_utc INT8,                     -- Original post time in UTC from Reddit API\n  fetched_at TIMESTAMPTZ DEFAULT now()  -- When this post was ingested into the system\n);\n\n-- Add an index to optimize queries by subreddit\nCREATE INDEX idx_post_subreddit ON reddit_posts(subreddit);\n\n-- ===============================================\n-- STEP 5: Create a helper function to check if a post exists\n-- ===============================================\n\n-- This function returns:\n-- { \"exists\": true } if the post ID is already in the reddit_posts table,\n-- or { \"exists\": false } if it is not.\n-- Useful for deduplication checks in automated workflows.\nCREATE OR REPLACE FUNCTION check_post_exists(p_id TEXT)\nRETURNS JSON\nLANGUAGE plpgsql\nAS $$\nBEGIN\n  RETURN json_build_object(\n    'exists', EXISTS (\n      SELECT 1 FROM reddit_posts WHERE id = p_id\n    )\n  );\nEND;\n$$;\n",
+        "height": 2000,
+        "width": 760,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -9260,
+        920
+      ],
+      "typeVersion": 1,
+      "id": "bb1a7f2d-4ed6-4501-a223-b27a046df0bc",
+      "name": "Sticky Note25"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "user_subreddit_preferences",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "6c8f2a36-fb1a-486a-8a45-5d574c7fba58"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -8220,
+        1100
+      ],
+      "id": "9c72a019-3c48-4895-9f68-4c2325ab6dfa",
+      "name": "Get User Subreddits",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## \ud83e\udde9 Setup Instructions for Reddit \u2192 Slack Integration\n\nBefore running this workflow, complete the following setup steps:\n\n---\n\n### \ud83d\udd10 Required Credentials\n\n1. **Reddit OAuth2 API**\n   - Create a Reddit app: https://www.reddit.com/prefs/apps\n   - App type: `script`\n   - Required values:\n     - **Client ID**\n     - **Client Secret**\n     - **Username / Password**\n   - Add this to your `Reddit OAuth2 API` credentials in n8n.\n\n2. **Supabase API**\n   - Create a project at [https://supabase.com](https://supabase.com)\n   - Go to Project Settings \u2192 API\n   - Use:\n     - **Project URL**\n     - **Service Role Key**\n   - Set up as `Supabase API` credential in n8n.\n   - In the SQL Editor, paste and run in the SQL note ->\n\n3. **OpenAI API**\n   - Create assistants at https://platform.openai.com/assistants\n   - You need 3 assistants:\n     - **Reddit Assistant** (for enrichment filter)\n     - **Summarizer Agent** (for long post summaries)\n     - **Message Formatter** (for Slack formatting)\n   - Use your OpenAI API key in `OpenAI API` credential in n8n.\n\n4. **Slack API**\n   - Create a Slack App: https://api.slack.com/apps\n   - Enable these OAuth scopes:\n     - `chat:write`\n     - `channels:read`\n   - Install the app to your workspace and add it to your desired channel.\n   - Add the bot token as a `Slack API` credential in n8n.\n\n---\n\n### \ud83d\udd27 Node Customizations\n\n- **Supabase - Check Post Exist**\n  - Uses an RPC (`check_post_exists`) to check if the post was already processed.\n  - Ensure this function is created in your database.\n\n- **Get User Subreddits**\n  - Replace hardcoded user ID (`6c8f2a36-fb1a-486a-8a45-5d574c7fba58`) with a dynamic or looped ID strategy if needed.\n\n- **Reddit Sorting**\n  - Uses `sort_method` field from user preference table (e.g., `hot`, `top`, `new`).\n\n- **Upvote Filter Threshold**\n  - The workflow only keeps posts with `upvote_ratio > 0.9`. Adjust in the **Filter Upvote Ratio** node if needed.",
+        "height": 1400,
+        "width": 740
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -10020,
+        920
+      ],
+      "typeVersion": 1,
+      "id": "b289859e-36a0-47fd-8fdc-514ca13071c7",
+      "name": "Sticky Note26"
+    }
+  ],
+  "pinData": {
+    "Run Every 1 Hour": [
+      {
+        "json": {
+          "timestamp": "2025-07-09T16:52:23.188-07:00",
+          "Readable date": "July 9th 2025, 4:52:23 pm",
+          "Readable time": "4:52:23 pm",
+          "Day of week": "Wednesday",
+          "Year": "2025",
+          "Month": "July",
+          "Day of month": "09",
+          "Hour": "16",
+          "Minute": "52",
+          "Second": "23",
+          "Timezone": "America/Los_Angeles (UTC-07:00)"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Filter Upvote Ratio to greater than 90": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Check Post Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Check Post Exist": {
+      "main": [
+        [
+          {
+            "node": "Route on if Post Already Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Database Columns": {
+      "main": [
+        [
+          {
+            "node": "Check Length",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Length": {
+      "main": [
+        [
+          {
+            "node": "Check if Summarization is Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Database Columns with Summarization": {
+      "main": [
+        [
+          {
+            "node": "Create New Record in Database (C-1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Summarization is Required": {
+      "main": [
+        [
+          {
+            "node": "Summarize Long Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create New Record in Database (C-2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get New Posts Based on User Preference": {
+      "main": [
+        [
+          {
+            "node": "Filter Upvote Ratio to greater than 90",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route on if Post Already Exists": {
+      "main": [
+        [
+          {
+            "node": "Set Database Columns",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "End of Path (P1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit Content Filter (RCF-2)": {
+      "main": [
+        [
+          {
+            "node": "Filter out \"Skip\" (F-2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit Content Filter (RCF-1)": {
+      "main": [
+        [
+          {
+            "node": "Filter out \"Skip\" (F-1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter out \"Skip\" (F-2)": {
+      "main": [
+        [
+          {
+            "node": "Update \"Is Enriching\" Flag (U-2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter out \"Skip\" (F-1)": {
+      "main": [
+        [
+          {
+            "node": "Update \"Is Enriching\" Flag (U-1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update \"Is Enriching\" Flag (U-2)": {
+      "main": [
+        [
+          {
+            "node": "Output Formatter (OF-2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update \"Is Enriching\" Flag (U-1)": {
+      "main": [
+        [
+          {
+            "node": "Output Formatter (OF-1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Long Text": {
+      "main": [
+        [
+          {
+            "node": "Set Database Columns with Summarization",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output Formatter (OF-2)": {
+      "main": [
+        [
+          {
+            "node": "Update Summarized Output (USO-2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output Formatter (OF-1)": {
+      "main": [
+        [
+          {
+            "node": "Update Summarized Output (USO-1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Every 1 Hour": {
+      "main": [
+        [
+          {
+            "node": "Get User Subreddits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Subreddit Channel (SC-1)": {
+      "main": [
+        [
+          {
+            "node": "End of Path (P3)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Subreddit Channel  (SC-2)": {
+      "main": [
+        [
+          {
+            "node": "End of Path (P2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Summarized Output (USO-1)": {
+      "main": [
+        [
+          {
+            "node": "Post to Subreddit Channel (SC-1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Summarized Output (USO-2)": {
+      "main": [
+        [
+          {
+            "node": "Post to Subreddit Channel  (SC-2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Record in Database (C-1)": {
+      "main": [
+        [
+          {
+            "node": "Reddit Content Filter (RCF-1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Record in Database (C-2)": {
+      "main": [
+        [
+          {
+            "node": "Reddit Content Filter (RCF-2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Subreddits": {
+      "main": [
+        [
+          {
+            "node": "Get New Posts Based on User Preference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b914d7f2-f01c-48aa-a95d-f9d57ac01db2",
+  "meta": {
+    "instanceId": "564ad264d05dc77e4e5afc0ced9da90c41c9a77ab9c35729bf6f29309796798d"
+  },
+  "id": "YJQFeVElSQwWY0gw",
+  "tags": [
+    {
+      "createdAt": "2025-07-05T19:52:23.769Z",
+      "updatedAt": "2025-07-05T19:52:23.769Z",
+      "id": "fUX9uTeJJQ8kDtWz",
+      "name": "YouTube"
+    },
+    {
+      "createdAt": "2025-07-05T19:52:38.804Z",
+      "updatedAt": "2025-07-05T19:52:38.804Z",
+      "id": "cU9VkbGFpqXHoVk7",
+      "name": "Tutorial"
+    }
+  ]
+}
