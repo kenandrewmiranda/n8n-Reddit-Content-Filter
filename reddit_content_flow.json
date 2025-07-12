@@ -145,7 +145,7 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const selftext = $input.item.json.selftext || \"\";\n\n// Estimate tokens (1 token \u2248 4 characters)\nconst tokenEstimate = Math.ceil(selftext.length / 4);\n\n// Add new field\n$input.item.json.summarized = tokenEstimate > 100;\n\nreturn $input.item;\n"
+        "jsCode": "const selftext = $input.item.json.selftext || \"\";\n\n// Estimate tokens (1 token \u2248 4 characters)\nconst tokenEstimate = Math.ceil(selftext.length / 4);\n\n// Add new field\n$input.item.json.summarized = tokenEstimate > 500;\n\nreturn $input.item;\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
