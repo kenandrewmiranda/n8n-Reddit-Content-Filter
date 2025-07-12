@@ -38,6 +38,7 @@ This automation:
 ```bash
 git clone https://github.com/your-username/reddit-to-slack-n8n.git
 cd reddit-to-slack-n8n
+```
 2. Import into n8n
 Open your n8n instance
 Click Import Workflow
