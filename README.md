@@ -39,7 +39,7 @@ This automation:
 ### 1. Clone This Repo
 
 ```
-git clone https://github.com/your-username/reddit-to-slack-n8n.git
+git clone https://github.com/kenandrewmiranda/reddit-content-filter-n8n.git
 cd reddit-to-slack-n8n
 ```
 
